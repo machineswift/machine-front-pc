@@ -1,0 +1,50 @@
+<div class="login-container">
+  <button mat-icon-button class="mac-close-button" (click)="closeDialog()">
+    <mat-icon>close</mat-icon>
+  </button>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>machine</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline">
+          <mat-label>用户名</mat-label>
+          <input matInput formControlName="username" required>
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            请输入用户名
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>密码</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            请输入密码
+          </mat-error>
+        </mat-form-field>
+
+        <div class="captcha-container">
+          <mat-form-field appearance="outline">
+            <mat-label>验证码</mat-label>
+            <input matInput formControlName="captcha" required>
+            <mat-error *ngIf="loginForm.get('captcha')?.hasError('required')">
+              请输入验证码
+            </mat-error>
+          </mat-form-field>
+          <div class="captcha-image" (click)="refreshCaptcha()">
+            <img *ngIf="captchaImg" [src]="captchaImg" alt="验证码">
+          </div>
+        </div>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isLoading">
+          <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+          <span *ngIf="!isLoading">登录</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

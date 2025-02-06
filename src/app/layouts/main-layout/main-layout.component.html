@@ -1,0 +1,81 @@
+<div class="layout-wrapper">
+  <!-- Header -->
+  <mat-toolbar class="header-toolbar">
+    <div class="toolbar-breadcrumb">
+      <ng-container *ngFor="let module of moduleItems; let last = last">
+        <button mat-button 
+                (click)="loadSubMenus(module.id)" 
+                class="breadcrumb-btn"
+                [class.active]="selectedModule === module.id">
+          <span class="breadcrumb-text">{{ module.name }}</span>
+        </button>
+      </ng-container>
+    </div>
+
+    <span class="toolbar-spacer"></span>
+
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="me-3">
+      <div class="user-avatar">
+        <span class="user-name">{{ currentUser?.name }}</span>
+      </div>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <a mat-menu-item routerLink="/profile">
+        <mat-icon>person_outline</mat-icon>
+        <span>个人信息</span>
+      </a>
+      <a mat-menu-item routerLink="/settings">
+        <mat-icon>settings</mat-icon>
+        <span>系统设置</span>
+      </a>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>退出登录</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="layout-container">
+    <!-- Left sidebar -->
+    <mat-sidenav mode="side" opened class="sidenav">
+      <mat-tree #tree [dataSource]="menuItems" [childrenAccessor]="childrenAccessor">
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+          <button mat-icon-button disabled></button>
+          <a [routerLink]="node.path" routerLinkActive="active-link" class="tree-node-text">
+            {{ node.name }}
+          </a>
+        </mat-tree-node>
+        <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodeToggle
+                       [cdkTreeNodeTypeaheadLabel]="node.name">
+          <button mat-icon-button matTreeNodeToggle
+                  [attr.aria-label]="'Toggle ' + node.name">
+            <mat-icon class="mat-icon-rtl-mirror">
+              {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+            </mat-icon>
+          </button>
+          <span class="tree-node-text">{{ node.name }}</span>
+        </mat-tree-node>
+      </mat-tree>
+    </mat-sidenav>
+
+    <!-- Main content -->
+    <mat-sidenav-content class="main-content-container">
+      <div class="main-content">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#" target="_blank">帮助文档</a>
+      <a href="#" target="_blank">API文档</a>
+      <a href="#" target="_blank">关于我们</a>
+    </div>
+    <div class="footer-copyright">
+      © 2024 machine. All rights reserved.
+    </div>
+  </footer>
+</div>

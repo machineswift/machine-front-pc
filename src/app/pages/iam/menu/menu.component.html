@@ -1,0 +1,274 @@
+<div class="menu-container">
+
+  <mat-grid-list cols="5" rowHeight="100px">
+
+    <mat-grid-tile [colspan]="5" [rowspan]="1" class="radio-tile">
+      <div class="radio-container">
+        <mat-radio-group [(ngModel)]="selectedApp"
+                        (change)="onAppChange($event)"
+                        class="app-radio-group">
+          <mat-radio-button *ngFor="let app of apps"
+                           [value]="app.id"
+                           class="app-radio-button">
+            {{ app.name }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="5" [rowspan]="1">
+      <mat-toolbar class="module-toolbar">
+        <div class="module-breadcrumb">
+          <button mat-button
+                  *ngFor="let module of moduleList"
+                  (click)="loadSubMenus(module.id)"
+                  class="module-btn"
+                  [class.active]="selectedModule === module.id">
+            <span class="module-text">{{ module.name }}</span>
+          </button>
+        </div>
+      </mat-toolbar>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="8" class="tree-tile">
+      <div class="tree-container" [class.has-data]="treePermission && treePermission.length > 0">
+        <mat-tree [dataSource]="treePermission" [childrenAccessor]="childrenAccessor">
+          <!-- 叶子节点模板 -->
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+            <button mat-icon-button disabled>
+              <mat-icon>{{ getResourceTypeIcon(node.resourceType) }}</mat-icon>
+            </button>
+            <span class="tree-node-text"
+                  (click)="selectNode(node)"
+                  [class.active]="selectedNodeId === node.id">
+              {{ node.name }}
+              <div class="node-actions" *ngIf="selectedNodeId === node.id">
+                <button mat-icon-button
+                        class="add-button"
+                        *ngIf="node.resourceType === 'MENU'"
+                        (click)="startCreate(node, $event)">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <button mat-icon-button
+                        class="delete-button"
+                        (click)="confirmDelete(node, $event)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </span>
+          </mat-tree-node>
+
+          <!-- 父节点模板 -->
+          <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
+                        matTreeNodePadding
+                        matTreeNodeToggle>
+            <button mat-icon-button
+                    [attr.aria-label]="'Toggle ' + node.name"
+                    (click)="onNodeToggle(node)">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <mat-icon class="resource-icon">{{ getResourceTypeIcon(node.resourceType) }}</mat-icon>
+            <span class="tree-node-text"
+                  (click)="selectNode(node)"
+                  [class.active]="selectedNodeId === node.id">
+              {{ node.name }}
+              <div class="node-actions" *ngIf="selectedNodeId === node.id">
+                <button mat-icon-button
+                        class="add-button"
+                        *ngIf="node.resourceType === 'MENU'"
+                        (click)="startCreate(node, $event)">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </span>
+          </mat-tree-node>
+        </mat-tree>
+      </div>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="4" [rowspan]="8">
+      <div class="detail-container" *ngIf="selectedDetail">
+        <mat-card>
+          <!-- 卡片头部 -->
+          <mat-card-header>
+            <mat-card-title>{{ getNodePath(selectedDetail) }}</mat-card-title>
+            <div class="header-actions">
+              <button mat-button
+                      color="primary"
+                      (click)="startEdit()"
+                      *ngIf="isViewing">
+                <mat-icon>edit</mat-icon> 编辑
+              </button>
+            </div>
+          </mat-card-header>
+
+          <!-- 新增模式内容 -->
+          <mat-card-content *ngIf="isCreating">
+            <ng-container *ngTemplateOutlet="createModeContent"></ng-container>
+          </mat-card-content>
+
+          <!-- 编辑模式内容 -->
+          <mat-card-content *ngIf="isEditing">
+            <ng-container *ngTemplateOutlet="editModeContent"></ng-container>
+          </mat-card-content>
+
+          <!-- 查看模式内容 -->
+          <mat-card-content *ngIf="isViewing">
+            <ng-container *ngTemplateOutlet="viewModeContent"></ng-container>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
+
+
+<!--  新增模式模板 -->
+<ng-template #createModeContent>
+  <form [formGroup]="createForm" (ngSubmit)="saveNewMenu()">
+    <!-- 新增模式模板中的字段配置 -->
+    <div class="detail-row" *ngFor="let field of [
+      {name: 'code', label: '编码', type: 'text', required: true},
+      {name: 'name', label: '名称', type: 'text', required: true},
+      {name: 'path', label: '路径', type: 'text', required: true},
+      {name: 'iconUrl', label: '图标', type: 'text', required: false},
+      {name: 'resourceType', label: '资源类型', type: 'select', required: true},
+      {name: 'sort', label: '排序', type: 'number', required: true, defaultValue: 0},
+      {name: 'dataMetaInto', label: '数据权限元数据', type: 'textarea', required: false},
+      {name: 'description', label: '描述', type: 'textarea', required: false}
+    ]">
+      <span class="label">
+        {{field.label}}
+        <span class="required-mark" *ngIf="field.required">*</span>
+      </span>
+      <mat-form-field>
+        <ng-container [ngSwitch]="field.type">
+          <ng-container *ngSwitchCase="'select'">
+            <mat-select [formControlName]="field.name" [required]="field.required || false">
+              <mat-option *ngFor="let option of resourceTypeOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </ng-container>
+          <input *ngSwitchCase="'text'"
+                 matInput
+                 [formControlName]="field.name"
+                 [required]="field.required || false">
+          <input *ngSwitchCase="'number'"
+                 matInput
+                 type="number"
+                 [formControlName]="field.name"
+                 [required]="field.required || false">
+          <textarea *ngSwitchCase="'textarea'"
+                    matInput
+                    [formControlName]="field.name"
+                    [required]="field.required || false">
+          </textarea>
+        </ng-container>
+        <mat-error *ngIf="createForm.get(field.name)?.invalid && createForm.get(field.name)?.touched">
+          {{field.label}}为必填项
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <button mat-button type="button" (click)="cancelCreate()" class="cancel-btn">
+        <span>取消</span>
+      </button>
+      <button mat-raised-button color="primary" type="submit" class="save-btn">
+        <span>保存</span>
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<!-- 编辑模式模板 -->
+<ng-template #editModeContent>
+  <form [formGroup]="editForm" (ngSubmit)="saveChanges()">
+    <div class="detail-row" *ngFor="let field of [
+      {name: 'code', label: '编码', type: 'text', required: true},
+      {name: 'name', label: '名称', type: 'text', required: true},
+      {name: 'path', label: '路径', type: 'text', required: true},
+      {name: 'iconUrl', label: '图标', type: 'text', required: false},
+      {name: 'sort', label: '排序', type: 'number', required: true, defaultValue: 0},
+      {name: 'dataMetaInto', label: '数据权限元数据', type: 'textarea', required: false},
+      {name: 'description', label: '描述', type: 'textarea', required: false}
+    ]">
+      <span class="label">
+        {{field.label}}
+        <span class="required-mark" *ngIf="field.required">*</span>
+      </span>
+      <mat-form-field>
+        <ng-container [ngSwitch]="field.type">
+          <input *ngSwitchCase="'text'"
+                 matInput
+                 [formControlName]="field.name"
+                 [required]="field.required || false">
+          <input *ngSwitchCase="'number'"
+                 matInput
+                 type="number"
+                 [formControlName]="field.name"
+                 [required]="field.required || false"
+                 min="0">
+          <textarea *ngSwitchCase="'textarea'"
+                   matInput
+                   [formControlName]="field.name"
+                   [required]="field.required || false">
+          </textarea>
+        </ng-container>
+        <mat-error *ngIf="editForm.get(field.name)?.invalid && editForm.get(field.name)?.touched">
+          <ng-container [ngSwitch]="true">
+            <ng-container *ngSwitchCase="editForm.get(field.name)?.hasError('required')">
+              {{field.label}}为必填项
+            </ng-container>
+            <ng-container *ngSwitchCase="editForm.get(field.name)?.hasError('min')">
+              {{field.label}}不能小于0
+            </ng-container>
+          </ng-container>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <button mat-button type="button" (click)="cancelEdit()" class="cancel-btn">
+        <span>取消</span>
+      </button>
+      <button mat-raised-button color="primary" type="submit" class="save-btn">
+        <span>保存</span>
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<!-- 查看模式模板 -->
+<ng-template #viewModeContent>
+  <ng-container *ngIf="selectedDetail">
+    <div class="detail-row" *ngFor="let field of [
+      {label: 'ID', value: selectedDetail?.id},
+      {label: '父ID', value: selectedDetail?.parentId},
+      {label: '类型', value: getResourceTypeLabel(selectedDetail?.resourceType || '')},
+      {label: '编码', value: selectedDetail?.code},
+      {label: '路径', value: selectedDetail?.path},
+      {label: '排序', value: selectedDetail?.sort},
+      {label: '数据权限元数据', value: selectedDetail?.dataMetaInto},
+      {label: '描述', value: selectedDetail?.description || '-'}
+    ]">
+      <span class="label">{{field.label}}：</span>
+      <span>{{field.value}}</span>
+    </div>
+
+    <mat-divider class="my-3"></mat-divider>
+
+    <div class="detail-row" *ngFor="let field of [
+      {label: '创建人', value: selectedDetail?.createName},
+      {label: '创建时间', value: selectedDetail?.createTime | date:'yyyy-MM-dd HH:mm:ss'},
+      {label: '更新人', value: selectedDetail?.updateName},
+      {label: '更新时间', value: selectedDetail?.updateTime | date:'yyyy-MM-dd HH:mm:ss'}
+    ]">
+      <span class="label">{{field.label}}：</span>
+      <span>{{field.value}}</span>
+    </div>
+  </ng-container>
+</ng-template>

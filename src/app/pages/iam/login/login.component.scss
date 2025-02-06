@@ -1,0 +1,157 @@
+.login-container {
+  min-height:50vh;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  box-sizing: border-box;
+  position: relative;
+
+  .mac-close-button {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    padding: 0;
+    background-color: #ff5f57;
+    border-radius: 50%;
+    border: none;
+    z-index: 1000;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #ff4b47;
+    }
+
+    mat-icon {
+      font-size: 10px;
+      width: 10px;
+      height: 10px;
+      line-height: 10px;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &:hover mat-icon {
+      color: rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  mat-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0;
+    padding: 24px;
+    border-radius: 8px;
+    position: relative; 
+
+    .mac-close-button {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      min-width: 12px;
+      padding: 0;
+      background-color: #ff5f57;
+      border-radius: 50%;
+      border: none;
+      z-index: 1;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #ff4b47;
+      }
+
+      mat-icon {
+        font-size: 10px;
+        width: 10px;
+        height: 10px;
+        line-height: 10px;
+        color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &:hover mat-icon {
+        color: rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    mat-card-header {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: center;
+      
+      mat-card-title {
+        font-size: 28px;
+        display: flex;
+        font-weight: 400;
+        margin: 0;
+      }
+    }
+
+    mat-card-content {
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        mat-form-field {
+          width: 100%;
+        }
+
+        .captcha-container {
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+
+          mat-form-field {
+            flex: 1;
+          }
+
+          .captcha-image {
+            margin-top: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            
+            img {
+              display: block;
+              width: 100px;
+              height: 40px;
+              object-fit: cover;
+            }
+
+            &:hover {
+              opacity: 0.8;
+            }
+          }
+        }
+
+        button[type="submit"] {
+          margin-top: 8px;
+          height: 44px;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+// 添加全局样式覆盖
+:host {
+  display: block;
+  height: 100%;
+}
+
+// 确保页面没有多余的边距
+:host ::ng-deep body {
+  margin: 0;
+  padding: 0;
+}
