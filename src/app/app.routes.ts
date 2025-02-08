@@ -44,7 +44,7 @@ export const routes: Routes = [
               // 获取上一次访问的路由
               const navigation = router.getCurrentNavigation();
               const previousUrl = navigation?.previousNavigation?.finalUrl?.toString() || '/main';
-              
+
               // 如果上一个路由是 404 页面，则返回首页
               if (previousUrl.includes('**')) {
                 router.navigate(['/main']);

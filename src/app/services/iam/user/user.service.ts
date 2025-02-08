@@ -18,7 +18,7 @@ export interface UserInfo {
   providedIn: 'root'
 })
 export class UserService {
-  private baseUrl = `${environment.apiBaseUrl}/xijie-iam-app`;
+  private baseUrl = `${environment.apiBaseUrl}/machine-iam-app`;
 
   constructor(private http: HttpClient,
               private tokenService: TokenService) {

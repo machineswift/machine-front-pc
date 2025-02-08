@@ -4,32 +4,32 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TokenService {
-  private readonly AUTH_TOKEN_KEY = 'authToken';
+  private readonly ACCESS_TOKEN_KEY = 'accessToken';
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
 
-  getAuthToken(): string | null {
-    return localStorage.getItem(this.AUTH_TOKEN_KEY);
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
   getRefreshToken(): string | null {
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
-  setTokens(authToken: string, refreshToken: string): void {
-    localStorage.setItem(this.AUTH_TOKEN_KEY, authToken);
+  setTokens(access: string, refreshToken: string): void {
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, access);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
   }
 
   clearTokens(): void {
-    localStorage.removeItem(this.AUTH_TOKEN_KEY);
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
 
   getAuthorizationHeader(): string {
-    return `Bearer ${this.getAuthToken()}`;
+    return `Bearer ${this.getAccessToken()}`;
   }
 
   hasValidToken(): boolean {
-    return !!this.getAuthToken();
+    return !!this.getAccessToken();
   }
 }

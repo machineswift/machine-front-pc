@@ -11,7 +11,7 @@ import {PermissionDetail, PermissionItem} from '../../../interfaces/iam/permissi
   providedIn: 'root'
 })
 export class PermissionService {
-  private baseUrl = `${environment.apiBaseUrl}/xijie-iam-app`;
+  private baseUrl = `${environment.apiBaseUrl}/machine-iam-app`;
 
   constructor(private http: HttpClient,
               private tokenService: TokenService) {

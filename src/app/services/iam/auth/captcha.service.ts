@@ -14,7 +14,7 @@ interface CaptchaData {
   providedIn: 'root'
 })
 export class CaptchaService {
-  private apiUrl = `${environment.apiBaseUrl}/xijie-iam-app/iam/auth/pic_captcha`;
+  private apiUrl = `${environment.apiBaseUrl}/machine-iam-app/iam/auth/pic_captcha`;
 
   constructor(private http: HttpClient) {}
 

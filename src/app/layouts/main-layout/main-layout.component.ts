@@ -109,7 +109,7 @@ export class MainLayoutComponent implements OnInit {
       },
       error: (error) => {
         console.error('登出失败', error);
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         this.router.navigate(['/']);
       }

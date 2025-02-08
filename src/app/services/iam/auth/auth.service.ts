@@ -8,7 +8,7 @@ import {TokenService} from './token.service';
 import {HttpService} from '../../http.service';
 
 interface AuthTokenData {
-  authToken: string;
+  accessToken: string;
   expiresIn: number;
   refreshToken: string;
   tokenType: string;
@@ -32,17 +32,17 @@ export class AuthService {
   }
 
   login(loginData: LoginRequest): Observable<AuthTokenData> {
-    return this.httpService.post<AuthTokenData>('/xijie-iam-app/iam/auth/login/username', loginData).pipe(
+    return this.httpService.post<AuthTokenData>('/machine-iam-app/iam/auth/login/username', loginData).pipe(
       tap(response => {
-        const {authToken, refreshToken} = response.data;
-        this.tokenService.setTokens(authToken, refreshToken);
+        const {accessToken, refreshToken} = response.data;
+        this.tokenService.setTokens(accessToken, refreshToken);
       }),
       map(response => response.data)
     );
   }
 
   logout(): Observable<any> {
-    return this.httpService.get('/xijie-iam-app/iam/auth/logout').pipe(
+    return this.httpService.get('/machine-iam-app/iam/auth/logout').pipe(
       tap(() => {
         this.tokenService.clearTokens();
       })

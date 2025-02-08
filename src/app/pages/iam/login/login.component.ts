@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit {
         finalize(() => this.isLoading = false)
       ).subscribe({
         next: (response) => {
-          localStorage.setItem('authToken', response.authToken);
+          localStorage.setItem('accessToken', response.accessToken);
           localStorage.setItem('refreshToken', response.refreshToken);
           this.router.navigate(['/main']);
           this.dialogRef.close();
